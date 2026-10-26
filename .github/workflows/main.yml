@@ -28,6 +28,7 @@ jobs:
 
       - name: SonarCloud analysis
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=janok181_tp-devops-correction-docker -Dsonar.organization=janok181 -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }} --file ./simple-api/pom.xml
+
   # define job to build and publish docker image
   build-and-push-docker-image:
     needs: test-backend
@@ -48,7 +49,7 @@ jobs:
           # relative path to the place where source code with Dockerfile is located
           context: ./simple-api
           # Note: tags has to be all lower-case
-          tags:  ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-simple-api:latest
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-simple-api:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push database
@@ -64,26 +65,27 @@ jobs:
           context: ./http-server
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-http-server:latest
           push: ${{ github.ref == 'refs/heads/main' }}
-    deploy:
-      needs: build-and-push-docker-image
-      if: github.ref == 'refs/heads/main'
-      runs-on: ubuntu-24.04
 
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+  deploy:
+    needs: build-and-push-docker-image
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
 
-        - name: Install Ansible
-          run: pipx install --include-deps ansible
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        - name: Set up SSH key
-          run: |
-            mkdir -p ~/.ssh
-            echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
+      - name: Install Ansible
+        run: pipx install --include-deps ansible
 
-        - name: Deploy with Ansible
-          working-directory: ./ansible
-          env:
-            ANSIBLE_HOST_KEY_CHECKING: "False"
-          run: ansible-playbook -i inventories/setup.yml playbook.yml -e ansible_ssh_private_key_file=$HOME/.ssh/id_rsa
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy with Ansible
+        working-directory: ./ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+        run: ansible-playbook -i inventories/setup.yml playbook.yml -e ansible_ssh_private_key_file=$HOME/.ssh/id_rsa
