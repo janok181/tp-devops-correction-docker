@@ -1,0 +1,13 @@
+---
+- name: Run HTTPD proxy
+  community.docker.docker_container:
+    name: httpd
+    image: janok181/tp-devops-http-server:latest
+    pull: true
+    restart_policy: always
+    ports:
+      - "80:80"
+    networks:
+      - name: my-network
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python3

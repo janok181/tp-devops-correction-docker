@@ -1,0 +1,15 @@
+---
+- name: Run backend API
+  community.docker.docker_container:
+    name: simple-api
+    image: janok181/tp-devops-simple-api:latest
+    pull: true
+    restart_policy: always
+    env:
+      # les variables que ton API utilise pour se connecter à la base
+      DATABASE_HOST: database
+      DATABASE_PASSWORD: pwd
+    networks:
+      - name: my-network
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python3
