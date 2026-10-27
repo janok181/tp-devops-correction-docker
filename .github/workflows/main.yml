@@ -97,5 +97,5 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
           echo "${{ secrets.VAULT_PASSWORD }}" > vault_pass.txt
-          ansible-playbook -i inventories/setup.yml playbook.yml -e ansible_ssh_private_key_file=$HOME/.ssh/id_rsa --vault_password-file vault_pass.txt
+          ansible-playbook -i inventories/setup.yml playbook.yml -e ansible_ssh_private_key_file=$HOME/.ssh/id_rsa --vault-password-file vault_pass.txt
           rm vault_pass.txt
