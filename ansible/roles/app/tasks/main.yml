@@ -8,7 +8,7 @@
     env:
       # les variables que ton API utilise pour se connecter à la base
       DATABASE_HOST: database
-      DATABASE_PASSWORD: pwd
+      DATABASE_PASSWORD: "{{ db_password }}"
     networks:
       - name: my-network
   vars:
